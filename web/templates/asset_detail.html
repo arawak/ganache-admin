@@ -64,7 +64,7 @@
       </div>
     </div>
     <div class="card" style="background:rgba(17,33,23,0.8);border:1px solid rgba(37,70,50,0.6);color:#e5e7eb;">
-      <form method="post" action="/assets/{{.Asset.ID}}/delete" style="display:flex;justify-content:center;">
+      <form method="post" action="/assets/{{.Asset.ID}}/delete" onsubmit="return confirm('Delete this asset? This cannot be undone.')" style="display:flex;justify-content:center;">
         <input type="hidden" name="csrf" value="{{.CSRF}}">
         <button class="btn ghost" type="submit" style="color:#f87171;border:1px solid rgba(248,113,113,0.35);">Delete asset</button>
       </form>

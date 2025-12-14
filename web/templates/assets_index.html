@@ -13,16 +13,18 @@
       <a class="btn primary" href="/assets/new" style="padding:10px 18px;">New Upload</a>
     </div>
     <form hx-get="/assets/results" hx-target="#results" hx-push-url="true" hx-trigger="input delay:300ms, change" style="display:flex;flex-direction:column;gap:12px;margin-top:14px;">
-      <div class="search-bar">
-        <span class="material-symbols-outlined" style="color:#95c6a9;">search</span>
-        <input name="q" type="search" value="{{.Query}}" placeholder="Search assets...">
-        <input type="hidden" name="sort" value="{{.Extra.sort}}">
-      </div>
-      <div style="display:flex;flex-wrap:wrap;gap:10px;align-items:center;justify-content:space-between;">
-        <div style="display:flex;gap:8px;flex-wrap:wrap;">
-          <span class="tag-pill">All</span>
-          {{range .Tags}}<span class="tag-pill">{{.}}</span>{{end}}
+        <div class="search-bar">
+          <span class="material-symbols-outlined" style="color:#95c6a9;">search</span>
+          <input name="q" type="search" value="{{.Query}}" placeholder="Search assets...">
         </div>
+        <div style="display:flex;flex-wrap:wrap;gap:10px;align-items:center;justify-content:space-between;">
+          <div style="display:flex;gap:8px;flex-wrap:wrap;">
+            <button type="button" class="tag-pill" hx-get="/assets/results?sort={{if .Extra}}{{.Extra.sort}}{{end}}&page=1&pageSize={{if .Extra}}{{.Extra.pageSize}}{{else}}20{{end}}" hx-target="#results" hx-push-url="true" hx-on::click="this.closest('form').querySelector('input[name=q]').value='';" style="border:none;background:none;cursor:pointer;">
+              All
+            </button>
+            {{range .Tags}}<span class="tag-pill">{{.}}</span>{{end}}
+          </div>
+
         <div style="display:flex;gap:8px;align-items:center;">
           <label class="label" for="sort" style="margin:0;color:#95c6a9;">Sort</label>
           <select id="sort" name="sort" class="input" style="max-width:160px;padding:8px 12px;">
