@@ -1,0 +1,74 @@
+{{define "asset_detail.html"}}
+{{template "layout.html" .}}
+{{end}}
+
+{{define "asset_detail_content"}}
+<div style="max-width:1200px;margin:0 auto;display:grid;grid-template-columns:2fr 1fr;gap:18px;align-items:start;">
+  <div class="card" style="background:#0a140e;border:1px solid var(--border-dark);box-shadow:var(--shadow-strong);padding:0;overflow:hidden;">
+    <div style="position:relative;background:#0a140e;display:flex;align-items:center;justify-content:center;min-height:360px;">
+      {{if .Asset.Variants.Content}}
+      <img src="{{.Asset.Variants.Content}}" alt="{{.Asset.Title}}" style="max-width:100%;max-height:80vh;object-fit:contain;display:block;">
+      {{end}}
+      <div style="position:absolute;bottom:12px;right:12px;background:rgba(0,0,0,0.65);color:#e5e7eb;font-size:12px;padding:6px 10px;border-radius:12px;border:1px solid rgba(255,255,255,0.08);">
+        {{.Asset.Variants.Content}}
+      </div>
+    </div>
+  </div>
+  <div style="display:flex;flex-direction:column;gap:12px;">
+    <div class="card" style="background:rgba(17,33,23,0.8);border:1px solid rgba(37,70,50,0.6);color:#e5e7eb;">
+      <div style="display:flex;flex-direction:column;gap:6px;margin-bottom:8px;">
+        <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;">
+          <span class="badge">Published</span>
+          <span class="tag-pill" style="background:rgba(37,70,50,0.8);color:#e5e7eb;">Public</span>
+        </div>
+        <h2 style="margin:0;color:#fff;font-size:22px;">{{.Asset.Title}}</h2>
+        <div style="display:flex;flex-wrap:wrap;gap:6px;">{{range .Asset.Tags}}<span class="tag-pill">{{.}}</span>{{end}}</div>
+      </div>
+      <div id="meta-panel">
+        {{template "asset_meta_partial.html" .}}
+      </div>
+    </div>
+    <div class="card" style="background:rgba(17,33,23,0.8);border:1px solid rgba(37,70,50,0.6);color:#e5e7eb;">
+      <div class="section-title" style="margin-bottom:10px;">
+        <span class="material-symbols-outlined" style="color:var(--color-primary);">link</span>
+        <span>URLs</span>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:8px;">
+        {{if .Asset.Variants.Thumb}}
+        <div class="url-row">
+          <div>
+            <div style="font-weight:700;font-size:13px;color:#fff;">Thumbnail</div>
+            <div class="url-text">{{.Asset.Variants.Thumb}}</div>
+          </div>
+          <button class="btn secondary" type="button" data-copy="{{.Asset.Variants.Thumb}}" style="padding:8px 12px;">Copy</button>
+        </div>
+        {{end}}
+        {{if .Asset.Variants.Content}}
+        <div class="url-row">
+          <div>
+            <div style="font-weight:700;font-size:13px;color:#fff;">Content</div>
+            <div class="url-text">{{.Asset.Variants.Content}}</div>
+          </div>
+          <button class="btn secondary" type="button" data-copy="{{.Asset.Variants.Content}}" style="padding:8px 12px;">Copy</button>
+        </div>
+        {{end}}
+        {{if .Asset.Variants.Original}}
+        <div class="url-row">
+          <div>
+            <div style="font-weight:700;font-size:13px;color:#fff;">Original</div>
+            <div class="url-text">{{.Asset.Variants.Original}}</div>
+          </div>
+          <button class="btn secondary" type="button" data-copy="{{.Asset.Variants.Original}}" style="padding:8px 12px;">Copy</button>
+        </div>
+        {{end}}
+      </div>
+    </div>
+    <div class="card" style="background:rgba(17,33,23,0.8);border:1px solid rgba(37,70,50,0.6);color:#e5e7eb;">
+      <form method="post" action="/assets/{{.Asset.ID}}/delete" style="display:flex;justify-content:center;">
+        <input type="hidden" name="csrf" value="{{.CSRF}}">
+        <button class="btn ghost" type="submit" style="color:#f87171;border:1px solid rgba(248,113,113,0.35);">Delete asset</button>
+      </form>
+    </div>
+  </div>
+</div>
+{{end}}

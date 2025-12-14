@@ -1,0 +1,28 @@
+{{define "assets_results_partial.html"}}
+<div class="grid-cards">
+  {{range .Assets}}
+  <div class="asset-card">
+    {{if .Variants.Thumb}}<img src="{{.Variants.Thumb}}" alt="{{.Title}}">{{end}}
+    <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:8px;">
+      <h3 style="margin:0;font-size:15px;color:#fff;"><a href="/assets/{{.ID}}" style="color:#fff;">{{.Title}}</a></h3>
+      <span class="material-symbols-outlined" style="color:#95c6a9;font-size:20px;">more_vert</span>
+    </div>
+    <div style="display:flex;flex-wrap:wrap;gap:6px;">
+      {{range .Tags}}<span class="tag-pill">{{.}}</span>{{end}}
+    </div>
+  </div>
+  {{else}}
+  <div class="card" style="grid-column:1/-1;text-align:center;">No assets found.</div>
+  {{end}}
+</div>
+{{with .Extra}}
+<div style="margin-top:14px;display:flex;gap:10px;justify-content:center;">
+  {{if .hasPrev}}
+  <button class="btn secondary" hx-get="/assets/results?q={{$.Query}}&page={{.prevPage}}&pageSize={{.pageSize}}{{range $.Tags}}&tag={{.}}{{end}}" hx-target="#results">Previous</button>
+  {{end}}
+  {{if .hasNext}}
+  <button class="btn primary" hx-get="/assets/results?q={{$.Query}}&page={{.nextPage}}&pageSize={{.pageSize}}{{range $.Tags}}&tag={{.}}{{end}}" hx-target="#results">Load more</button>
+  {{end}}
+</div>
+{{end}}
+{{end}}

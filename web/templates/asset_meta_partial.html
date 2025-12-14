@@ -1,0 +1,41 @@
+{{define "asset_meta_partial.html"}}
+<div style="display:flex;flex-direction:column;gap:10px;">
+  <div class="section-title">
+    <span class="material-symbols-outlined" style="color:var(--color-primary);">edit_document</span>
+    <span>Metadata</span>
+  </div>
+  <form hx-post="/assets/{{.Asset.ID}}/edit" hx-target="#meta-panel" hx-swap="outerHTML" style="display:flex;flex-direction:column;gap:12px;">
+    <input type="hidden" name="csrf" value="{{.CSRF}}">
+    <div>
+      <label class="label" for="title">Title</label>
+      <input id="title" name="title" type="text" class="input" value="{{.Asset.Title}}">
+    </div>
+    <div>
+      <label class="label" for="caption">Caption</label>
+      <textarea id="caption" name="caption" rows="3" class="input">{{.Asset.Caption}}</textarea>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+      <div>
+        <label class="label" for="credit">Credit</label>
+        <input id="credit" name="credit" type="text" class="input" value="{{.Asset.Credit}}">
+      </div>
+      <div>
+        <label class="label" for="source">Source</label>
+        <input id="source" name="source" type="text" class="input" value="{{.Asset.Source}}">
+      </div>
+    </div>
+    <div>
+      <label class="label" for="usageNotes">Usage notes</label>
+      <input id="usageNotes" name="usageNotes" type="text" class="input" value="{{.Asset.UsageNotes}}">
+    </div>
+    <div>
+      <label class="label" for="tags">Tags (comma separated)</label>
+      <input id="tags" name="tags" type="text" class="input" value="{{join .Asset.Tags ", "}}" hx-get="/tags" hx-target="#tag-suggestions" hx-trigger="keyup changed delay:300ms" hx-params="prefix">
+      <div id="tag-suggestions" style="margin:6px 0;"></div>
+    </div>
+    <div style="display:flex;justify-content:flex-end;gap:10px;">
+      <button class="btn primary" type="submit">Save changes</button>
+    </div>
+  </form>
+</div>
+{{end}}

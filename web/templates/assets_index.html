@@ -1,0 +1,98 @@
+{{define "assets_index.html"}}
+{{template "layout.html" .}}
+{{end}}
+
+{{define "assets_index_content"}}
+<div style="display:flex;flex-direction:column;gap:18px;max-width:1200px;margin:0 auto;">
+  <div class="card" style="padding:18px;border-radius:20px;background:rgba(17,33,23,0.7);border:1px solid rgba(37,70,50,0.6);color:#e5e7eb;">
+    <div style="display:flex;flex-wrap:wrap;gap:12px;align-items:center;justify-content:space-between;">
+      <div>
+        <div style="display:flex;align-items:center;gap:8px;color:#95c6a9;font-size:12px;font-weight:700;letter-spacing:0.05em;">MEDIA LIBRARY</div>
+        <h2 style="margin:4px 0 0;font-size:24px;color:#fff;">Assets</h2>
+      </div>
+      <a class="btn primary" href="/assets/new" style="padding:10px 18px;">New Upload</a>
+    </div>
+    <form hx-get="/assets/results" hx-target="#results" hx-push-url="true" hx-trigger="input delay:300ms, change" style="display:flex;flex-direction:column;gap:12px;margin-top:14px;">
+      <div class="search-bar">
+        <span class="material-symbols-outlined" style="color:#95c6a9;">search</span>
+        <input name="q" type="search" value="{{.Query}}" placeholder="Search assets...">
+        <input type="hidden" name="sort" value="{{.Extra.sort}}">
+      </div>
+      <div style="display:flex;flex-wrap:wrap;gap:10px;align-items:center;justify-content:space-between;">
+        <div style="display:flex;gap:8px;flex-wrap:wrap;">
+          <span class="tag-pill">All</span>
+          {{range .Tags}}<span class="tag-pill">{{.}}</span>{{end}}
+        </div>
+        <div style="display:flex;gap:8px;align-items:center;">
+          <label class="label" for="sort" style="margin:0;color:#95c6a9;">Sort</label>
+          <select id="sort" name="sort" class="input" style="max-width:160px;padding:8px 12px;">
+            <option value="newest" {{if eq .Extra.sort "newest"}}selected{{end}}>Newest</option>
+            <option value="oldest" {{if eq .Extra.sort "oldest"}}selected{{end}}>Oldest</option>
+          </select>
+        </div>
+      </div>
+    </form>
+  </div>
+
+  <div id="results">
+    {{template "assets_results_partial.html" .}}
+  </div>
+
+  {{if and .Extra .Extra.new}}
+  <div class="card" style="background:rgba(17,33,23,0.7);border:1px solid rgba(37,70,50,0.6);color:#e5e7eb;">
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:18px;align-items:start;flex-wrap:wrap;">
+      <div>
+        <div class="dropzone" id="paste-zone">
+          <div>
+            <div style="display:flex;justify-content:center;margin-bottom:12px;">
+              <span class="material-symbols-outlined" style="font-size:40px;color:var(--color-primary);">cloud_upload</span>
+            </div>
+            <h3 style="margin:0 0 8px;font-size:20px;color:#fff;">Paste image here (Ctrl+V)</h3>
+            <p style="margin:0;color:#95c6a9;font-size:14px;">Or drag and drop files. Supports high-res JPG, PNG, WEBP.</p>
+            <div id="paste-preview" style="margin-top:12px;"></div>
+          </div>
+        </div>
+      </div>
+      <div>
+        <form id="upload-form" method="post" action="/assets/upload" enctype="multipart/form-data" style="display:flex;flex-direction:column;gap:12px;">
+          <input type="hidden" name="csrf" value="{{.CSRF}}">
+          <div>
+            <label class="label" for="file">File</label>
+            <input id="file" name="file" type="file" accept="image/*" class="input">
+          </div>
+          <div>
+            <label class="label" for="title">Title</label>
+            <input id="title" name="title" type="text" class="input">
+          </div>
+          <div>
+            <label class="label" for="caption">Caption</label>
+            <textarea id="caption" name="caption" rows="3" class="input"></textarea>
+          </div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+            <div>
+              <label class="label" for="credit">Credit</label>
+              <input id="credit" name="credit" type="text" class="input">
+            </div>
+            <div>
+              <label class="label" for="source">Source</label>
+              <input id="source" name="source" type="text" class="input">
+            </div>
+          </div>
+          <div>
+            <label class="label" for="usageNotes">Usage notes</label>
+            <input id="usageNotes" name="usageNotes" type="text" class="input">
+          </div>
+          <div>
+            <label class="label" for="tags">Tags (comma separated)</label>
+            <input id="tags" name="tags" type="text" class="input" placeholder="marketing, 2024">
+          </div>
+          <div style="display:flex;justify-content:flex-end;">
+            <button class="btn primary" type="submit">Save to Library</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+  {{end}}
+</div>
+{{end}}

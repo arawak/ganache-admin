@@ -1,0 +1,35 @@
+{{define "login.html"}}
+{{template "layout.html" .}}
+{{end}}
+
+{{define "login_content"}}
+<div style="display:flex;justify-content:center;align-items:center;min-height:70vh;">
+  <div class="card" style="max-width:420px;width:100%;padding:32px;border-radius:24px;box-shadow:var(--shadow-strong);background:rgba(27,50,36,0.65);border:1px solid rgba(54,226,123,0.2);color:#e5e7eb;">
+    <div style="display:flex;flex-direction:column;align-items:center;text-align:center;gap:12px;margin-bottom:18px;">
+      <div style="width:64px;height:64px;border-radius:50%;background:rgba(54,226,123,0.12);display:flex;align-items:center;justify-content:center;box-shadow:inset 0 0 0 1px rgba(54,226,123,0.3);">
+        <span class="material-symbols-outlined" style="color:var(--color-primary);font-size:30px;">shield_person</span>
+      </div>
+      <h2 style="margin:0;font-size:24px;color:#fff;">Ganache Admin</h2>
+      <p style="margin:0;font-size:14px;color:#95c6a9;">Sign in to manage the image library</p>
+    </div>
+    <form method="post" action="/login" style="display:flex;flex-direction:column;gap:14px;">
+      <div>
+        <label class="label" for="username">Username</label>
+        <div style="position:relative;">
+          <span class="material-symbols-outlined" style="position:absolute;left:12px;top:50%;transform:translateY(-50%);color:#95c6a9;">person</span>
+          <input class="input" id="username" name="username" type="text" autocomplete="username" required style="padding-left:42px;">
+        </div>
+      </div>
+      <div>
+        <label class="label" for="password">Password</label>
+        <div style="position:relative;">
+          <span class="material-symbols-outlined" style="position:absolute;left:12px;top:50%;transform:translateY(-50%);color:#95c6a9;">lock</span>
+          <input class="input" id="password" name="password" type="password" autocomplete="current-password" required style="padding-left:42px;">
+        </div>
+      </div>
+      <button class="btn primary" type="submit" style="width:100%;height:48px;">Login</button>
+    </form>
+    <div class="footer-note" style="margin-top:20px;">Authorized personnel only. Access is monitored.</div>
+  </div>
+</div>
+{{end}}
