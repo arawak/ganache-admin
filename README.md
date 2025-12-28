@@ -23,6 +23,32 @@ Server-side rendered admin UI for the Ganache media service. It uses Go + `html/
 
 Static assets and templates are under `web/`; Ganache requests are made server-to-server with the `X-Api-Key` header and request timeouts.
 
+## Official Docker image
+
+A lightweight distroless image is published to GitHub Container Registry for every tagged release:
+
+```
+docker pull ghcr.io/arawak/ganache-admin:latest
+```
+
+- Tags include `latest`, the semantic version (e.g., `1.2.3`), and the exact git tag (e.g., `v1.2.3`).
+- The image runs as a non-root user and needs access to `users.yaml` plus Ganache credentials.
+- Mount your config directory and pass the required environment variables when running locally:
+
+```bash
+docker run --rm \
+  -e GANACHE_BASE_URL="http://host.docker.internal:8081" \
+  -e GANACHE_API_KEY="changeme" \
+  -e UI_SESSION_SECRET="dev-session-secret" \
+  -e UI_CSRF_SECRET="dev-csrf-secret" \
+  -e UI_LISTEN_ADDR=":8080" \
+  -v $(pwd)/users.yaml:/config/users.yaml:ro \
+  -p 8080:8080 \
+  ghcr.io/arawak/ganache-admin:latest
+```
+
+Expose the service behind TLS and set `UI_SECURE_COOKIE=true` to send Secure cookies in production.
+
 ## users.yaml format
 ```yaml
 users:
