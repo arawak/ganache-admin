@@ -1,0 +1,16 @@
+# Local configuration / secrets
+.env
+users.yaml
+
+# Go build/test outputs
+*.exe
+*.dll
+*.so
+*.dylib
+*.test
+*.out
+
+# Common OS/editor files
+.DS_Store
+.idea/
+.vscode/

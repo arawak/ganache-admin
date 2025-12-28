@@ -49,6 +49,28 @@ docker run --rm \
 
 Expose the service behind TLS and set `UI_SECURE_COOKIE=true` to send Secure cookies in production.
 
+## Running with Docker Compose
+
+A sample `docker-compose.yml` is included in this repo and expects two local files:
+
+- `.env` for environment variables (use `.env.example` as a starting point)
+- `users.yaml` for local auth (mounted read-only)
+
+```bash
+cp .env.example .env
+# edit .env
+
+docker compose up -d
+
+docker compose logs -f ganache-admin
+```
+
+Stop the stack:
+
+```bash
+docker compose down
+```
+
 ## users.yaml format
 ```yaml
 users:
@@ -69,10 +91,22 @@ Verify a password against an existing hash:
 go run ./cmd/ganache-admin-cli verify "$2a$12$example..."
 ```
 
-## Example .env
+## .env variables
+
+Use `.env.example` as a starting point.
+
+For production, generate strong secrets (example):
+
+```bash
+openssl rand -hex 32
+```
+
+Example `.env`:
+
 ```
 UI_LISTEN_ADDR=:8080
-UI_USERS_FILE=./users.yaml
+# UI_USERS_FILE=./users.yaml        # default for `go run` (optional)
+# UI_USERS_FILE=/config/users.yaml  # default in Docker image
 UI_SESSION_SECRET=dev-session-secret
 UI_CSRF_SECRET=dev-csrf-secret
 GANACHE_BASE_URL=http://localhost:8081

@@ -1,0 +1,13 @@
+services:
+  ganache-admin:
+    image: ghcr.io/arawak/ganache-admin:latest
+    # Or build locally:
+    # build:
+    #   context: .
+    ports:
+      - "8080:8080"
+    env_file:
+      - .env
+    volumes:
+      - ./users.yaml:/config/users.yaml:ro
+    restart: unless-stopped
