@@ -9,7 +9,10 @@ import (
 	"golang.org/x/crypto/bcrypt"
 )
 
+var version = "dev"
+
 func main() {
+	fmt.Printf("ganache-admin-cli %s\n", version)
 	if len(os.Args) < 2 {
 		fmt.Println("usage: ganache-admin-cli [hashpw|verify <hash>]")
 		os.Exit(1)

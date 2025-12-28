@@ -11,6 +11,8 @@ import (
 	"ganache-admin-ui/internal/httpui"
 )
 
+var version = "dev"
+
 func main() {
 	cfg, err := config.Load()
 	if err != nil {
@@ -30,7 +32,7 @@ func main() {
 		log.Fatal(err)
 	}
 
-	log.Printf("listening on %s", cfg.ListenAddr)
+	log.Printf("ganache-admin-ui %s listening on %s", version, cfg.ListenAddr)
 	if err := http.ListenAndServe(cfg.ListenAddr, srv.Router()); err != nil {
 		log.Fatal(err)
 	}
