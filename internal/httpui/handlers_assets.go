@@ -31,7 +31,7 @@ func (s *Server) assetsIndex(w http.ResponseWriter, r *http.Request) {
 		"nextPage": resp.Page + 1,
 		"pageSize": resp.PageSize,
 	}
-	s.templates.Render(w, "assets_index.html", TemplateData{
+	s.render(w, "assets_index.html", TemplateData{
 		Title:  "Assets",
 		Query:  q,
 		Tags:   tags,
@@ -62,7 +62,7 @@ func (s *Server) assetsResults(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if r.Header.Get("HX-Request") != "true" {
-		s.templates.Render(w, "assets_index.html", TemplateData{
+		s.render(w, "assets_index.html", TemplateData{
 			Title:  "Assets",
 			Query:  q,
 			Tags:   tags,
@@ -73,7 +73,7 @@ func (s *Server) assetsResults(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	s.templates.Render(w, "assets_results_partial.html", TemplateData{
+	s.render(w, "assets_results_partial.html", TemplateData{
 		Query:  q,
 		Tags:   tags,
 		Search: resp,
@@ -83,7 +83,7 @@ func (s *Server) assetsResults(w http.ResponseWriter, r *http.Request) {
 }
 
 func (s *Server) assetsNew(w http.ResponseWriter, r *http.Request) {
-	s.templates.Render(w, "assets_index.html", TemplateData{
+	s.render(w, "assets_index.html", TemplateData{
 		Title: "Upload Asset",
 		Extra: map[string]any{"new": true},
 	}, r)
@@ -114,10 +114,10 @@ func (s *Server) assetsUpload(w http.ResponseWriter, r *http.Request) {
 	asset, err := s.client.CreateAssetMultipart(r.Context(), file, header.Filename, fields, tags)
 	if err != nil {
 		data := TemplateData{Title: "Upload Asset", Error: err.Error(), Extra: map[string]any{"new": true}}
-		s.templates.Render(w, "assets_index.html", data, r)
+		s.render(w, "assets_index.html", data, r)
 		return
 	}
-	http.Redirect(w, r, fmt.Sprintf("/assets/%s", asset.ID), http.StatusFound)
+	http.Redirect(w, r, s.path(fmt.Sprintf("/assets/%s", asset.ID)), http.StatusFound)
 }
 
 func (s *Server) assetDetail(w http.ResponseWriter, r *http.Request) {
@@ -127,7 +127,7 @@ func (s *Server) assetDetail(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, err.Error(), http.StatusBadGateway)
 		return
 	}
-	s.templates.Render(w, "asset_detail.html", TemplateData{Title: asset.Title, Asset: asset}, r)
+	s.render(w, "asset_detail.html", TemplateData{Title: asset.Title, Asset: asset}, r)
 }
 
 func (s *Server) assetEdit(w http.ResponseWriter, r *http.Request) {
@@ -150,10 +150,10 @@ func (s *Server) assetEdit(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	if r.Header.Get("HX-Request") == "true" {
-		s.templates.Render(w, "asset_meta_partial.html", TemplateData{Asset: asset}, r)
+		s.render(w, "asset_meta_partial.html", TemplateData{Asset: asset}, r)
 		return
 	}
-	http.Redirect(w, r, fmt.Sprintf("/assets/%s", asset.ID), http.StatusFound)
+	http.Redirect(w, r, s.path(fmt.Sprintf("/assets/%s", asset.ID)), http.StatusFound)
 }
 
 func (s *Server) assetDelete(w http.ResponseWriter, r *http.Request) {
@@ -162,7 +162,7 @@ func (s *Server) assetDelete(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, err.Error(), http.StatusBadGateway)
 		return
 	}
-	http.Redirect(w, r, "/assets", http.StatusFound)
+	http.Redirect(w, r, s.path("/assets"), http.StatusFound)
 }
 
 func parseTags(r *http.Request) []string {

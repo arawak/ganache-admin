@@ -17,18 +17,19 @@ type Templates struct {
 }
 
 type TemplateData struct {
-	Title   string
-	User    string
-	CSRF    string
-	Flash   string
-	Error   string
-	Query   string
-	Tags    []string
-	Search  any
-	Asset   any
-	Assets  any
-	Extra   map[string]any
-	Content template.HTML
+	Title    string
+	User     string
+	CSRF     string
+	Flash    string
+	Error    string
+	Query    string
+	Tags     []string
+	Search   any
+	Asset    any
+	Assets   any
+	Extra    map[string]any
+	Content  template.HTML
+	BasePath string
 }
 
 func ParseTemplates() (*Templates, error) {

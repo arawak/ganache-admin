@@ -1,7 +1,7 @@
 {{define "assets_results_partial.html"}}
 <div class="grid-cards">
   {{range .Assets}}
-  <a class="asset-card" href="/assets/{{.ID}}" style="color:inherit;text-decoration:none;">
+  <a class="asset-card" href="{{$.BasePath}}/assets/{{.ID}}" style="color:inherit;text-decoration:none;">
     {{if .Variants.Thumb}}<img src="{{.Variants.Thumb}}" alt="{{.Title}}">{{end}}
     <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:8px;">
       <h3 style="margin:0;font-size:15px;color:#fff;">{{.Title}}</h3>
@@ -18,10 +18,10 @@
 {{with .Extra}}
 <div style="margin-top:14px;display:flex;gap:10px;justify-content:center;">
   {{if .hasPrev}}
-  <button class="btn secondary" hx-get="/assets/results?q={{$.Query}}&page={{.prevPage}}&pageSize={{.pageSize}}{{range $.Tags}}&tag={{.}}{{end}}" hx-target="#results">Previous</button>
+  <button class="btn secondary" hx-get="{{$.BasePath}}/assets/results?q={{$.Query}}&page={{.prevPage}}&pageSize={{.pageSize}}{{range $.Tags}}&tag={{.}}{{end}}" hx-target="#results">Previous</button>
   {{end}}
   {{if .hasNext}}
-  <button class="btn primary" hx-get="/assets/results?q={{$.Query}}&page={{.nextPage}}&pageSize={{.pageSize}}{{range $.Tags}}&tag={{.}}{{end}}" hx-target="#results">Load more</button>
+  <button class="btn primary" hx-get="{{$.BasePath}}/assets/results?q={{$.Query}}&page={{.nextPage}}&pageSize={{.pageSize}}{{range $.Tags}}&tag={{.}}{{end}}" hx-target="#results">Load more</button>
   {{end}}
 </div>
 {{end}}

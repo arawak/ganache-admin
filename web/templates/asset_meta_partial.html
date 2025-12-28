@@ -4,7 +4,7 @@
     <span class="material-symbols-outlined" style="color:var(--color-primary);">edit_document</span>
     <span>Metadata</span>
   </div>
-  <form hx-post="/assets/{{.Asset.ID}}/edit" hx-target="#meta-panel" hx-swap="outerHTML" style="display:flex;flex-direction:column;gap:12px;">
+  <form hx-post="{{.BasePath}}/assets/{{.Asset.ID}}/edit" hx-target="#meta-panel" hx-swap="outerHTML" style="display:flex;flex-direction:column;gap:12px;">
     <input type="hidden" name="csrf" value="{{.CSRF}}">
     <div>
       <label class="label" for="title">Title</label>
@@ -30,7 +30,7 @@
     </div>
     <div>
       <label class="label" for="tags">Tags (comma separated)</label>
-      <input id="tags" name="tags" type="text" class="input" value="{{join .Asset.Tags ", "}}" hx-get="/tags" hx-target="#tag-suggestions" hx-trigger="keyup changed delay:300ms" hx-params="prefix">
+      <input id="tags" name="tags" type="text" class="input" value="{{join .Asset.Tags ", "}}" hx-get="{{.BasePath}}/tags" hx-target="#tag-suggestions" hx-trigger="keyup changed delay:300ms" hx-params="prefix">
       <div id="tag-suggestions" style="margin:6px 0;"></div>
     </div>
     <div style="display:flex;justify-content:flex-end;gap:10px;">

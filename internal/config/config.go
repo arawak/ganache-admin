@@ -5,6 +5,8 @@ import (
 	"errors"
 	"fmt"
 	"os"
+	"path"
+	"strings"
 	"time"
 
 	"github.com/joho/godotenv"
@@ -26,6 +28,7 @@ type Config struct {
 	UsersFile     string
 	SessionSecret []byte
 	CSRFSecret    []byte
+	BasePath      string
 	Ganache       GanacheConfig
 }
 
@@ -34,6 +37,7 @@ func Load() (*Config, error) {
 
 	listenAddr := valueOrDefault("UI_LISTEN_ADDR", defaultListenAddr)
 	usersFile := valueOrDefault("UI_USERS_FILE", defaultUsersFile)
+	basePath := normalizeBasePath(os.Getenv("UI_BASE_PATH"))
 
 	ganacheBase := os.Getenv("GANACHE_BASE_URL")
 	if ganacheBase == "" {
@@ -64,6 +68,7 @@ func Load() (*Config, error) {
 		UsersFile:     usersFile,
 		SessionSecret: sessionSecret,
 		CSRFSecret:    csrfSecret,
+		BasePath:      basePath,
 		Ganache: GanacheConfig{
 			BaseURL: ganacheBase,
 			APIKey:  ganacheKey,
@@ -91,4 +96,19 @@ func readSecret(key string) ([]byte, error) {
 		return nil, fmt.Errorf("generate secret: %w", err)
 	}
 	return buf, nil
+}
+
+func normalizeBasePath(raw string) string {
+	raw = strings.TrimSpace(raw)
+	if raw == "" || raw == "/" {
+		return ""
+	}
+	if !strings.HasPrefix(raw, "/") {
+		raw = "/" + raw
+	}
+	clean := path.Clean(raw)
+	if clean == "." || clean == "/" {
+		return ""
+	}
+	return clean
 }

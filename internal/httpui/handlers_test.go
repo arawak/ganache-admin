@@ -16,7 +16,7 @@ import (
 	"ganache-admin-ui/internal/ganache"
 )
 
-func newTestServer(t *testing.T, ganacheHandler http.HandlerFunc) (*Server, *auth.SessionStore) {
+func newTestServer(t *testing.T, ganacheHandler http.HandlerFunc, opts ...func(*config.Config)) (*Server, *auth.SessionStore) {
 	t.Helper()
 	backend := httptest.NewServer(ganacheHandler)
 	t.Cleanup(backend.Close)
@@ -31,6 +31,9 @@ func newTestServer(t *testing.T, ganacheHandler http.HandlerFunc) (*Server, *aut
 			APIKey:  "key",
 			Timeout: time.Second,
 		},
+	}
+	for _, opt := range opts {
+		opt(cfg)
 	}
 	users, err := auth.NewUserStore([]auth.User{{Username: "tester", PasswordHash: "hash"}})
 	if err != nil {
@@ -168,5 +171,54 @@ func TestAssetEditSendsPatchAndRendersPartial(t *testing.T) {
 	}
 	if !strings.Contains(rec.Body.String(), "Updated") {
 		t.Fatalf("expected updated partial")
+	}
+}
+
+func TestBasePathLoginServed(t *testing.T) {
+	srv, _ := newTestServer(t, func(w http.ResponseWriter, r *http.Request) {}, func(cfg *config.Config) {
+		cfg.BasePath = "/media/admin"
+	})
+	router := srv.Router()
+
+	req := httptest.NewRequest(http.MethodGet, "/media/admin/login", nil)
+	rec := httptest.NewRecorder()
+	router.ServeHTTP(rec, req)
+
+	if rec.Code != http.StatusOK {
+		t.Fatalf("expected 200, got %d", rec.Code)
+	}
+	if !strings.Contains(rec.Body.String(), "action=\"/media/admin/login\"") {
+		t.Fatalf("response missing prefixed action: %s", rec.Body.String())
+	}
+}
+
+func TestBasePathRedirectsIncludePrefix(t *testing.T) {
+	srv, sessions := newTestServer(t, func(w http.ResponseWriter, r *http.Request) {}, func(cfg *config.Config) {
+		cfg.BasePath = "/media/admin"
+	})
+	router := srv.Router()
+
+	sess, _ := sessions.Create("tester")
+	req := httptest.NewRequest(http.MethodGet, "/", nil)
+	req.AddCookie(&http.Cookie{Name: "session", Value: sess.ID})
+	rec := httptest.NewRecorder()
+	router.ServeHTTP(rec, req)
+
+	if rec.Code != http.StatusFound {
+		t.Fatalf("expected 302, got %d", rec.Code)
+	}
+	if loc := rec.Header().Get("Location"); loc != "/media/admin/assets" {
+		t.Fatalf("expected prefixed redirect, got %s", loc)
+	}
+
+	req2 := httptest.NewRequest(http.MethodGet, "/media/admin/", nil)
+	rec2 := httptest.NewRecorder()
+	router.ServeHTTP(rec2, req2)
+
+	if rec2.Code != http.StatusFound {
+		t.Fatalf("expected 302, got %d", rec2.Code)
+	}
+	if loc := rec2.Header().Get("Location"); loc != "/media/admin/login" {
+		t.Fatalf("expected prefixed login redirect, got %s", loc)
 	}
 }
