@@ -3,6 +3,7 @@ package httpui
 import (
 	"net/http"
 	"os"
+	"strings"
 	"time"
 
 	"ganache-admin-ui/internal/auth"
@@ -48,7 +49,7 @@ func (s *Server) Router() http.Handler {
 	r.Post("/login", s.handleLogin)
 
 	r.Group(func(pr chi.Router) {
-		pr.Use(auth.RequireAuth(s.sessions))
+		pr.Use(auth.RequireAuth(s.sessions, s.path("/login")))
 		pr.Use(security.Middleware())
 
 		pr.Post("/logout", s.handleLogout)
@@ -64,18 +65,36 @@ func (s *Server) Router() http.Handler {
 
 	go s.sessionCleanup()
 
-	return r
+	if s.cfg.BasePath == "" {
+		return r
+	}
+
+	return http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
+		if trimmed, ok := s.stripBasePath(req.URL.Path); ok {
+			clone := req.Clone(req.Context())
+			clone.URL.Path = trimmed
+			clone.URL.RawPath = trimmed
+			if req.URL.RawQuery != "" {
+				clone.RequestURI = trimmed + "?" + req.URL.RawQuery
+			} else {
+				clone.RequestURI = trimmed
+			}
+			r.ServeHTTP(w, clone)
+			return
+		}
+		r.ServeHTTP(w, req)
+	})
 }
 
 func (s *Server) rootRedirect(w http.ResponseWriter, r *http.Request) {
 	if cookie, err := r.Cookie("session"); err == nil {
 		if sess, ok := s.sessions.Get(cookie.Value); ok {
 			r = r.WithContext(auth.ContextWithSession(r.Context(), sess))
-			http.Redirect(w, r, "/assets", http.StatusFound)
+			http.Redirect(w, r, s.path("/assets"), http.StatusFound)
 			return
 		}
 	}
-	http.Redirect(w, r, "/login", http.StatusFound)
+	http.Redirect(w, r, s.path("/login"), http.StatusFound)
 }
 
 func (s *Server) sessionCleanup() {
@@ -83,6 +102,53 @@ func (s *Server) sessionCleanup() {
 	for range ticker.C {
 		s.sessions.CleanupExpired()
 	}
+}
+
+func (s *Server) stripBasePath(p string) (string, bool) {
+	base := s.cfg.BasePath
+	if base == "" {
+		return "", false
+	}
+	if p == base {
+		return "/", true
+	}
+	if strings.HasPrefix(p, base+"/") {
+		trimmed := strings.TrimPrefix(p, base)
+		if trimmed == "" {
+			trimmed = "/"
+		}
+		return trimmed, true
+	}
+	return "", false
+}
+
+func (s *Server) path(rel string) string {
+	if rel == "" {
+		rel = "/"
+	}
+	if !strings.HasPrefix(rel, "/") {
+		rel = "/" + rel
+	}
+	base := s.cfg.BasePath
+	if base == "" {
+		return rel
+	}
+	if rel == "/" {
+		return base
+	}
+	return base + rel
+}
+
+func (s *Server) cookiePath() string {
+	if s.cfg.BasePath == "" {
+		return "/"
+	}
+	return s.cfg.BasePath
+}
+
+func (s *Server) render(w http.ResponseWriter, name string, data TemplateData, r *http.Request) {
+	data.BasePath = s.cfg.BasePath
+	s.templates.Render(w, name, data, r)
 }
 
 func secureCookie() bool {

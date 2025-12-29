@@ -9,9 +9,9 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Spline+Sans:wght@400;500;600;700&family=Noto+Sans:wght@400;500;700&display=swap" rel="stylesheet">
   <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="/static/styles.css">
-  <script src="/static/htmx.min.js" defer></script>
-  <script src="/static/app.js" defer></script>
+  <link rel="stylesheet" href="{{.BasePath}}/static/styles.css">
+  <script src="{{.BasePath}}/static/htmx.min.js" defer></script>
+  <script src="{{.BasePath}}/static/app.js" defer></script>
 </head>
 <body class="dark">
   <header class="header-shell">
@@ -21,14 +21,14 @@
         <span>Ganache Admin</span>
       </div>
       <nav class="nav-links" style="display:flex;gap:8px;align-items:center;">
-        <a href="/assets" class="{{if eq .Title "Assets"}}active{{end}}">Library</a>
-        <a href="/assets/new" class="{{if .Extra.new}}active{{end}}">Upload</a>
+        <a href="{{.BasePath}}/assets" class="{{if eq .Title "Assets"}}active{{end}}">Library</a>
+        <a href="{{.BasePath}}/assets/new" class="{{if .Extra.new}}active{{end}}">Upload</a>
       </nav>
     </div>
     <div style="display:flex;align-items:center;gap:10px;">
       {{if .User}}
       <span style="color:#95c6a9;font-weight:600;">{{.User}}</span>
-      <form class="inline" method="post" action="/logout">
+      <form class="inline" method="post" action="{{.BasePath}}/logout">
         <input type="hidden" name="csrf" value="{{.CSRF}}">
         <button class="btn ghost" type="submit">Logout</button>
       </form>

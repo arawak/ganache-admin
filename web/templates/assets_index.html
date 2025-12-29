@@ -10,16 +10,16 @@
         <div style="display:flex;align-items:center;gap:8px;color:#95c6a9;font-size:12px;font-weight:700;letter-spacing:0.05em;">MEDIA LIBRARY</div>
         <h2 style="margin:4px 0 0;font-size:24px;color:#fff;">Assets</h2>
       </div>
-      <a class="btn primary" href="/assets/new" style="padding:10px 18px;">New Upload</a>
+      <a class="btn primary" href="{{.BasePath}}/assets/new" style="padding:10px 18px;">New Upload</a>
     </div>
-    <form hx-get="/assets/results" hx-target="#results" hx-push-url="true" hx-trigger="input delay:300ms, change" style="display:flex;flex-direction:column;gap:12px;margin-top:14px;">
+    <form hx-get="{{.BasePath}}/assets/results" hx-target="#results" hx-push-url="true" hx-trigger="input delay:300ms, change" style="display:flex;flex-direction:column;gap:12px;margin-top:14px;">
         <div class="search-bar">
           <span class="material-symbols-outlined" style="color:#95c6a9;">search</span>
           <input name="q" type="search" value="{{.Query}}" placeholder="Search assets...">
         </div>
         <div style="display:flex;flex-wrap:wrap;gap:10px;align-items:center;justify-content:space-between;">
           <div style="display:flex;gap:8px;flex-wrap:wrap;">
-            <button type="button" class="tag-pill" hx-get="/assets/results?sort={{if .Extra}}{{.Extra.sort}}{{end}}&page=1&pageSize={{if .Extra}}{{.Extra.pageSize}}{{else}}20{{end}}" hx-target="#results" hx-push-url="true" hx-on::click="this.closest('form').querySelector('input[name=q]').value='';" style="border:none;background:none;cursor:pointer;">
+            <button type="button" class="tag-pill" hx-get="{{.BasePath}}/assets/results?sort={{if .Extra}}{{.Extra.sort}}{{end}}&page=1&pageSize={{if .Extra}}{{.Extra.pageSize}}{{else}}20{{end}}" hx-target="#results" hx-push-url="true" hx-on::click="this.closest('form').querySelector('input[name=q]').value='';" style="border:none;background:none;cursor:pointer;">
               All
             </button>
             {{range .Tags}}<span class="tag-pill">{{.}}</span>{{end}}
@@ -56,7 +56,7 @@
         </div>
       </div>
       <div>
-        <form id="upload-form" method="post" action="/assets/upload" enctype="multipart/form-data" style="display:flex;flex-direction:column;gap:12px;">
+        <form id="upload-form" method="post" action="{{.BasePath}}/assets/upload" enctype="multipart/form-data" style="display:flex;flex-direction:column;gap:12px;">
           <input type="hidden" name="csrf" value="{{.CSRF}}">
           <div>
             <label class="label" for="file">File</label>

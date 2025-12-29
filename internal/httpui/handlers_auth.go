@@ -9,7 +9,7 @@ import (
 
 func (s *Server) showLogin(w http.ResponseWriter, r *http.Request) {
 	data := TemplateData{Title: "Login"}
-	s.templates.Render(w, "login.html", data, r)
+	s.render(w, "login.html", data, r)
 }
 
 func (s *Server) handleLogin(w http.ResponseWriter, r *http.Request) {
@@ -21,7 +21,7 @@ func (s *Server) handleLogin(w http.ResponseWriter, r *http.Request) {
 	password := r.FormValue("password")
 	if !s.users.Validate(username, password) {
 		data := TemplateData{Title: "Login", Error: "Invalid credentials"}
-		s.templates.Render(w, "login.html", data, r)
+		s.render(w, "login.html", data, r)
 		return
 	}
 	sess, err := s.sessions.Create(username)
@@ -33,8 +33,8 @@ func (s *Server) handleLogin(w http.ResponseWriter, r *http.Request) {
 	if r.TLS != nil {
 		secure = true
 	}
-	auth.SetSessionCookie(w, sess, secure)
-	http.Redirect(w, r, "/assets", http.StatusFound)
+	auth.SetSessionCookie(w, sess, secure, s.cookiePath())
+	http.Redirect(w, r, s.path("/assets"), http.StatusFound)
 }
 
 func (s *Server) handleLogout(w http.ResponseWriter, r *http.Request) {
@@ -42,6 +42,6 @@ func (s *Server) handleLogout(w http.ResponseWriter, r *http.Request) {
 	if err == nil {
 		s.sessions.Delete(cookie.Value)
 	}
-	auth.ClearSessionCookie(w)
-	http.Redirect(w, r, "/login", http.StatusFound)
+	auth.ClearSessionCookie(w, s.cookiePath())
+	http.Redirect(w, r, s.path("/login"), http.StatusFound)
 }

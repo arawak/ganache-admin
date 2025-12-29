@@ -55,7 +55,7 @@ func TestSessionStore(t *testing.T) {
 func TestRequireAuthMiddleware(t *testing.T) {
 	store := NewSessionStore(time.Minute)
 	sess, _ := store.Create("tester")
-	h := RequireAuth(store)(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+	h := RequireAuth(store, "/login")(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusOK)
 	}))
 
@@ -72,5 +72,32 @@ func TestRequireAuthMiddleware(t *testing.T) {
 	h.ServeHTTP(rec2, req2)
 	if rec2.Code != http.StatusFound {
 		t.Fatalf("expected redirect, got %d", rec2.Code)
+	}
+	if loc := rec2.Header().Get("Location"); loc != "/login" {
+		t.Fatalf("expected /login redirect, got %s", loc)
+	}
+}
+
+func TestSessionCookiePath(t *testing.T) {
+	sess := Session{ID: "abc", ExpiresAt: time.Now().Add(time.Hour)}
+
+	rec := httptest.NewRecorder()
+	SetSessionCookie(rec, sess, false, "/media/admin")
+	cookies := rec.Result().Cookies()
+	if len(cookies) != 1 {
+		t.Fatalf("expected 1 cookie, got %d", len(cookies))
+	}
+	if cookies[0].Path != "/media/admin" {
+		t.Fatalf("unexpected cookie path %s", cookies[0].Path)
+	}
+
+	rec = httptest.NewRecorder()
+	ClearSessionCookie(rec, "/media/admin")
+	cookies = rec.Result().Cookies()
+	if len(cookies) != 1 {
+		t.Fatalf("expected 1 cookie, got %d", len(cookies))
+	}
+	if cookies[0].Path != "/media/admin" {
+		t.Fatalf("unexpected cleared cookie path %s", cookies[0].Path)
 	}
 }

@@ -107,6 +107,7 @@ Example `.env`:
 UI_LISTEN_ADDR=:8080
 # UI_USERS_FILE=./users.yaml        # default for `go run` (optional)
 # UI_USERS_FILE=/config/users.yaml  # default in Docker image
+# UI_BASE_PATH=/media/admin         # optional path prefix when reverse proxied
 UI_SESSION_SECRET=dev-session-secret
 UI_CSRF_SECRET=dev-csrf-secret
 GANACHE_BASE_URL=http://localhost:8081
@@ -114,8 +115,23 @@ GANACHE_API_KEY=changeme
 GANACHE_TIMEOUT=10s
 ```
 
+## Deploying under a subpath
+- Set `UI_BASE_PATH` to the mount point (e.g., `/media/admin`). Leading slashes are optional; trailing slashes are ignored.
+- All routes, redirects, static assets, and form actions inherit this prefix, and the session cookie path is scoped to the same value so it does not leak to your main site.
+- The server accepts both prefixed requests (e.g., `/media/admin/assets`) and plain `/assets` requests, so it works whether or not your proxy strips the prefix.
+- Example Caddy snippet that proxies to a local instance on `:8082`:
+
+```
+handle_path /media/admin* {
+  reverse_proxy 127.0.0.1:8082
+}
+```
+
+Because `handle_path` removes the prefix before proxying, keep `UI_BASE_PATH=/media/admin` so that user-visible links still include the correct path.
+
 ## Security notes
 - Ganache API key is only used in server-to-server requests and is not exposed to templates or JavaScript.
-- Session cookies are HttpOnly and SameSite=Lax; set `UI_SECURE_COOKIE=true` or run behind TLS to send the Secure flag.
+- Session cookies are HttpOnly and SameSite:Lax; set `UI_SECURE_COOKIE=true` or run behind TLS to send the Secure flag.
 - CSRF tokens are required for POST/PATCH/DELETE routes (HTMX uses the hidden input in forms).
 - Uploads are capped at 25MB before forwarding to Ganache.
+
